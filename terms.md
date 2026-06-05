@@ -32,6 +32,7 @@ The provision of physical equipment for evaluation constitutes an asset-for-serv
 * **Technical Validation Window:** Comprehensive empirical evaluation requires proper bench testing time. Our operational timeline scales to approximately **1 month** from physical asset delivery, unless explicit alternative metrics are authorized prior to logistics processing.
 * **Exclusion of Content Blackouts:** Lost In Tech will not accept structural scheduling restrictions or mandatory "blackout windows" dictating when competitive hardware options can be tested, mentioned, or featured on the channel.
 * **Publishing Timelines:** While coordination with corporate launch milestones is managed as an administrative courtesy, engineering precision, data integrity, and exhaustive exploration will never be bypassed to accommodate an external corporate promotional schedule.
+* **No Timeline Guarantee:** Review work is secondary to paid sponsor work. No guaranteed delivery date is given, nor is the timeline above a promise or binding agreement. 
 * **Non Disclosure or Contractual Agreements** While we understand that products are subject to embargoes and non disclosure periods, we generally do not sign anything beyond very minimal NDA agreements that cover **only** the timing of release of information regarding the product. Any attempt to manipulate speech or content integrity through an NDA will be rejected, and the document will remain unsigned. 
 
 ### Technical Support Strategy & Data Integrity
