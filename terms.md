@@ -6,7 +6,7 @@
 * **Footer:** © 2026 Lost In Tech. All rights reserved. Maintained under strict independent journalistic protocols.
 
 ## 00. Preamble & Core Principle
-This specification defines the regulatory standard governing all hardware evaluations hosted by Lost In Tech. It serves to protect strict consumer-facing integrity, preserve full operational transparency, and eliminate inefficiencies or misunderstandings during the negotiation cycle and beyond.
+This specification defines the regulatory standard governing all hardware evaluations hosted by Lost In Tech. It serves to protect strict consumer-facing integrity, preserve full operational transparency, and eliminate inefficiencies or misunderstandings during the negotiation cycle and beyond.  
 The provision of physical equipment for evaluation constitutes an asset-for-service exchange, balancing physical inventory against intensive **technical validation variables, diagnostic schedules, and un-curated media coverage**. This framework explicitly does not establish a marketing services agreement, a corporate campaign sponsorship, or a work-for-hire production contract.  
 
 * Important: If your proposal or agreement is for **sponsored work**, you will need a different agreement. Please contact us. 
