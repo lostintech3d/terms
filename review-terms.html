@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Hardware Evaluation Specification (OHES)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        .accordion-content.open { opacity: 1; }
+        .rotate-icon { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .open .rotate-icon { transform: rotate(180deg); }
+        
+        /* Rendered Markdown Styling */
+        .markdown-body ul { list-style-type: disc; padding-left: 1.25rem; }
+        .markdown-body li { margin-bottom: 0.75rem; text-align: justify; }
+        .markdown-body strong { color: #0f172a; font-weight: 600; }
+        .markdown-body p { margin-bottom: 0.85rem; text-align: justify; }
+        .markdown-body code { background-color: #f1f5f9; color: #047857; padding: 0.125rem 0.375rem; font-size: 0.875em; border-radius: 0.25rem; border: 1px solid #e2e8f0; font-weight: 600; }
+        
+        /* Dynamic list numbering styling for the final section */
+        .markdown-body ol { list-style-type: none; counter-reset: item; padding: 0; }
+        .markdown-body ol li { position: relative; margin-bottom: 1rem; padding-left: 2.5rem; }
+        .markdown-body ol li::before {
+            counter-increment: item;
+            content: counter(item);
+            position: absolute;
+            left: 0;
+            top: 0.125rem;
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            font-weight: 700;
+            font-size: 0.75rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-emerald-100 selection:text-slate-900">
+
+    <header class="border-b border-slate-200 bg-white/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <span id="meta-version" class="text-xs font-semibold tracking-widest text-slate-700 uppercase bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">Loading Framework...</span>
+                <h1 id="meta-title" class="text-xl font-bold tracking-tight text-slate-900 mt-2">Connecting to Repository...</h1>
+            </div>
+            <div class="text-left sm:text-right">
+                <p id="meta-id" class="text-xs text-slate-500 font-semibold uppercase tracking-wider"></p>
+                <p id="meta-subtitle" class="text-xs text-slate-400 font-medium"></p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-12 flex-grow w-full">
+        
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-8 shadow-sm">
+            <h2 id="preamble-title" class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-3">00. Preamble</h2>
+            <div id="preamble-body" class="text-slate-700 leading-relaxed text-justify">Loading definitions...</div>
+        </section>
+
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="articles-title" class="text-xs font-semibold tracking-wider text-slate-400 uppercase">01. Articles of Engagement</h2>
+            <button id="toggle-all-btn" class="text-xs font-semibold text-slate-600 hover:text-slate-900 transition focus:outline-none">
+                Expand All [+]
+            </button>
+        </div>
+
+        <div id="accordion-container" class="space-y-4"></div>
+
+        <section class="bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-8 mt-12 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 blur-3xl rounded-full"></div>
+            
+            <h2 id="compliance-title" class="text-xs font-semibold tracking-wider text-slate-800 uppercase mb-4">02. Compliance</h2>
+            <div id="compliance-body" class="markdown-body text-slate-600 text-sm sm:text-base">Initializing verification module...</div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-400 font-medium tracking-wide">
+        <p id="meta-footer">© Lost In Tech. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('terms.md')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error mapping terms.md configuration layer.');
+                    return response.text();
+                })
+                .then(rawMarkdown => {
+                    initializeSpecificationEngine(rawMarkdown);
+                })
+                .catch(error => {
+                    document.getElementById('meta-title').textContent = "Configuration Error";
+                    document.getElementById('preamble-body').textContent = "Failed to synchronize terms from the content matrix. Please confirm terms.md exists.";
+                    console.error(error);
+                });
+        });
+
+        function initializeSpecificationEngine(rawMarkdown) {
+            // Normalize line breaks cleanly
+            const lines = rawMarkdown.replace(/\r\n/g, '\n').split('\n');
+            
+            let currentSection = 'METADATA';
+            let metadataText = '';
+            let preambleText = '';
+            let articlesText = '';
+            let complianceText = '';
+            
+            let preambleHeader = '00. Preamble & Core Principle';
+            let articlesHeader = '01. Articles of Engagement';
+            let complianceHeader = '02. Compliance Verification & Authorization';
+
+            // Parse document line by line into structured buckets
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('## 00.')) {
+                    currentSection = 'PREAMBLE';
+                    preambleHeader = trimmed.replace('##', '').trim();
+                    return;
+                } else if (trimmed.startsWith('## 01.')) {
+                    currentSection = 'ARTICLES';
+                    articlesHeader = trimmed.replace('##', '').trim();
+                    return;
+                } else if (trimmed.startsWith('## 02.')) {
+                    currentSection = 'COMPLIANCE';
+                    complianceHeader = trimmed.replace('##', '').trim();
+                    return;
+                } else if (trimmed.startsWith('# METADATA')) {
+                    currentSection = 'METADATA';
+                    return;
+                }
+
+                if (currentSection === 'METADATA') metadataText += line + '\n';
+                else if (currentSection === 'PREAMBLE') preambleText += line + '\n';
+                else if (currentSection === 'ARTICLES') articlesText += line + '\n';
+                else if (currentSection === 'COMPLIANCE') complianceText += line + '\n';
+            });
+
+            // Process Metadata Variables
+            const meta = {};
+            metadataText.split('\n').forEach(line => {
+                const match = line.match(/\*\s*\*\*([^:]+)\*\*:\s*(.*)/);
+                if (match) {
+                    let key = match[1].trim();
+                    let value = match[2].trim().replace(/^['"\s]+|['"\s]+$/g, '');
+                    meta[key] = value;
+                }
+            });
+            
+            // Render Metadata to DOM
+            document.getElementById('meta-title').textContent = meta.Title || "Open Hardware Evaluation Specification";
+            document.getElementById('meta-version').textContent = meta.Version || "Standard Framework";
+            document.getElementById('meta-id').textContent = meta.DocumentID || "";
+            document.getElementById('meta-subtitle').textContent = meta.Subtitle || "";
+            document.getElementById('meta-footer').textContent = meta.Footer || "© Document is published under Open Source Licence. See licence for details.";
+
+            // Render Section 00 (Preamble)
+            document.getElementById('preamble-title').textContent = preambleHeader;
+            const paragraphs = preambleText.trim().split('\n\n').filter(Boolean);
+            if (paragraphs.length > 0) {
+                // Render the definitive first paragraph as the large introduction text
+                let htmlOutput = `<p class="text-lg text-slate-700 leading-relaxed mb-6 text-justify">${marked.parseInline(paragraphs[0])}</p>`;
+                
+                // If there are subsequent paragraphs, wrap all of them together inside the shaded container
+                if (paragraphs.length > 1) {
+                    const remainingMarkdown = paragraphs.slice(1).join('\n\n');
+                    htmlOutput += `<div class="mt-6 p-4 bg-slate-50 border-l-2 border-slate-400 rounded-r-xl text-sm text-slate-500 leading-relaxed text-justify markdown-body">${marked.parse(remainingMarkdown)}</div>`;
+                }
+                document.getElementById('preamble-body').innerHTML = htmlOutput;
+            }
+
+            // Render Section 01 (Accordions)
+            document.getElementById('articles-title').textContent = articlesHeader;
+            const container = document.getElementById('accordion-container');
+            container.innerHTML = ''; // Flush loading text
+
+            const articles = articlesText.trim().split(/\n###\s+/);
+            articles.forEach((article, index) => {
+                const articleLines = article.trim().split('\n');
+                let title = articleLines[0].replace('###', '').trim();
+                if (!title) return;
+
+                const contentMarkdown = articleLines.slice(1).join('\n');
+                const contentHtml = marked.parse(contentMarkdown);
+                const sectionNumber = `01.${index + 1}`;
+
+                const accordionItem = document.createElement('div');
+                accordionItem.className = "accordion-item bg-white border border-slate-200 rounded-xl overflow-hidden transition-all duration-200 hover:border-slate-300 shadow-sm";
+                
+                accordionItem.innerHTML = `
+                    <button class="accordion-trigger w-full px-6 py-5 text-left flex justify-between items-center gap-4 focus:outline-none">
+                        <div class="flex items-center gap-4">
+                            <span class="text-slate-500 font-bold text-sm">${sectionNumber}</span>
+                            <h3 class="text-base font-semibold text-slate-900 tracking-tight">${title}</h3>
+                        </div>
+                        <svg class="rotate-icon w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="markdown-body px-6 pb-6 pt-2 border-t border-slate-100 bg-slate-50/50 text-slate-600 text-sm sm:text-base leading-relaxed">
+                            ${contentHtml}
+                        </div>
+                    </div>
+                `;
+
+                accordionItem.querySelector('.accordion-trigger').addEventListener('click', () => toggleAccordion(accordionItem));
+                container.appendChild(accordionItem);
+            });
+
+            // Render Section 02 (Compliance)
+            document.getElementById('compliance-title').textContent = complianceHeader;
+            document.getElementById('compliance-body').innerHTML = marked.parse(complianceText.trim());
+        }
+
+        // UI Controls
+        function toggleAccordion(item) {
+            const content = item.querySelector('.accordion-content');
+            const isOpen = content.classList.contains('open');
+            
+            if (isOpen) {
+                content.style.maxHeight = '0px';
+                content.classList.remove('open');
+                item.classList.remove('open');
+            } else {
+                content.classList.add('open');
+                content.style.maxHeight = content.scrollHeight + "px";
+                item.classList.add('open');
+                
+                setTimeout(() => {
+                    item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 200);
+            }
+            updateToggleButtonText();
+        }
+
+        const toggleAllBtn = document.getElementById('toggle-all-btn');
+        toggleAllBtn.addEventListener('click', () => {
+            const items = document.querySelectorAll('.accordion-item');
+            const contents = document.querySelectorAll('.accordion-content');
+            const allOpen = Array.from(contents).every(c => c.classList.contains('open'));
+
+            items.forEach((item) => {
+                const content = item.querySelector('.accordion-content');
+                if (allOpen) {
+                    content.style.maxHeight = '0px';
+                    content.classList.remove('open');
+                    item.classList.remove('open');
+                } else {
+                    content.classList.add('open');
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    item.classList.add('open');
+                }
+            });
+            updateToggleButtonText();
+        });
+
+        function updateToggleButtonText() {
+            const contents = document.querySelectorAll('.accordion-content');
+            const allOpen = Array.from(contents).every(c => c.classList.contains('open'));
+            toggleAllBtn.textContent = allOpen ? 'Collapse All [-]' : 'Expand All [+]';
+        }
+    </script>
+</body>
+</html>
