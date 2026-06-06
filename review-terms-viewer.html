@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Lost In Tech Reviews Work — Plain English</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --accent: #e8ff47;
+    --accent2: #ff6b35;
+    --text: #f0f0f0;
+    --muted: #888;
+    --green: #4ade80;
+    --red: #f87171;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.025;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px;
+    z-index: 0;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 48px 24px 40px;
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(232, 255, 71, 0.08);
+    border: 1px solid rgba(232, 255, 71, 0.2);
+    padding: 4px 12px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(24px, 4vw, 38px);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 580px;
+    line-height: 1.6;
+  }
+
+  .subtitle strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .intro-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 24px 28px;
+    margin-bottom: 48px;
+    font-size: 15px;
+    color: #ccc;
+    line-height: 1.7;
+  }
+
+  .intro-box strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 48px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover {
+    border-color: #3a3a3a;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px 28px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .card-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(232, 255, 71, 0.06);
+    border: 1px solid rgba(232, 255, 71, 0.15);
+    padding: 3px 8px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .card-title small {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-top: 4px;
+  }
+
+  .card-body {
+    padding: 0 28px 24px 68px;
+    font-size: 14.5px;
+    color: #bbb;
+    line-height: 1.75;
+  }
+
+  .card-body p {
+    margin-bottom: 12px;
+  }
+
+  .card-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  .pill.yes {
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    color: var(--green);
+  }
+
+  .pill.no {
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    color: var(--red);
+  }
+
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 40px 0;
+  }
+
+  .bottom-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent2);
+    padding: 28px 32px;
+    margin-top: 48px;
+  }
+
+  .bottom-box h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent2);
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .bottom-box p {
+    font-size: 14px;
+    color: #aaa;
+    line-height: 1.7;
+  }
+
+  .bottom-box a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(232, 255, 71, 0.3);
+  }
+
+  .bottom-box a:hover {
+    border-bottom-color: var(--accent);
+  }
+
+  .why-matters {
+    background: var(--surface2);
+    border-left: 2px solid var(--accent2);
+    padding: 12px 16px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #999;
+    font-style: italic;
+  }
+
+  .why-matters strong {
+    color: var(--accent2);
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  @media (max-width: 600px) {
+    .card-body {
+      padding-left: 28px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+
+<header>
+  <div class="tag">Lost In Tech · Review Framework</div>
+  <h1>How reviews work here.<br><span>Plain English.</span></h1>
+  <p class="subtitle">Every hardware review on this channel operates under a <strong>published, public framework</strong>. Here's what that actually means for you as a viewer — no legal jargon.</p>
+</header>
+
+<main>
+
+  <div class="intro-box">
+    <strong>Why does this exist?</strong> When a company sends hardware for review, there's often pressure — subtle or not — to produce favourable content. This framework exists to make it structurally impossible for that to happen. If a company won't agree to these terms, the hardware doesn't arrive. Simple as that.
+  </div>
+
+  <div class="section-label">01 · Editorial Independence</div>
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">1.1</span>
+        <div class="card-title">
+          No previews. No drafts. No approvals.
+          <small>Companies never see the video before you do.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill no">✗ Draft review</span>
+          <span class="pill no">✗ Pre-publication approval</span>
+          <span class="pill no">✗ Script review</span>
+          <span class="pill yes">✓ Published direct to you</span>
+        </div>
+        <p>The first time anyone at the manufacturer sees the finished video is when it goes public — same as you. There is no back-channel review process, no "technical accuracy check" that doubles as editorial control, and no opportunity to request changes before release.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> Pre-publication approval is how positive-only reviews happen. Remove it and the company has no mechanism to soften, edit, or suppress findings they don't like.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">1.2</span>
+        <div class="card-title">
+          Negatives are fair game.
+          <small>Nothing gets softened because a company asks nicely.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill no">✗ "Please don't mention that"</span>
+          <span class="pill no">✗ "Avoid exaggerating shortcomings"</span>
+          <span class="pill yes">✓ Full honest assessment</span>
+        </div>
+        <p>If something doesn't work well, that goes in the video. If software is buggy, if build quality is disappointing, if the product doesn't do what it claims — that's exactly the kind of information you need to make a purchasing decision, and it will be in the review.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> "Please don't exaggerate shortcomings" is real contract language companies use. It sounds reasonable until you realise it means "don't tell viewers about problems."</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">1.3</span>
+        <div class="card-title">
+          Competitors can always be mentioned.
+          <small>No blackout windows. No restrictions on what else gets covered.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill no">✗ "Don't mention competitors"</span>
+          <span class="pill no">✗ "7-day blackout on other brands"</span>
+          <span class="pill yes">✓ Full comparative freedom</span>
+        </div>
+        <p>If a competing product does something better, that will be said. If another company's scanner, printer, or tool is more relevant to what you're trying to do — that gets mentioned. No brand agreement restricts what else appears on this channel.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> Competitor blackouts are designed to prevent you from hearing "actually, this other product is better for your use case." That's information you deserve.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">1.4</span>
+        <div class="card-title">
+          Reputation protection clauses are rejected.
+          <small>Test results are test results, regardless of how they reflect on a brand.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill no">✗ "Don't harm our reputation"</span>
+          <span class="pill no">✗ "Remove content if we ask"</span>
+          <span class="pill yes">✓ Results published as found</span>
+        </div>
+        <p>Some companies include clauses requiring content to be removed if it damages their brand image. Those clauses are refused outright. Engineering results, test data, and honest findings will be published regardless of whether they're flattering.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> A company that needs contractual protection from honest reviews is implicitly telling you their product can't survive honest reviews.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label">02 · Your Content, Your Viewing</div>
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">2.1</span>
+        <div class="card-title">
+          Videos stay on this channel.
+          <small>No re-uploaded, re-edited versions appearing on YouTube elsewhere.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill no">✗ Re-uploaded to brand YouTube</span>
+          <span class="pill no">✗ Edited brand versions on YouTube</span>
+          <span class="pill yes">✓ Original stays here</span>
+          <span class="pill yes">✓ Embed on brand website OK</span>
+        </div>
+        <p>Manufacturers cannot re-upload or re-edit the video to their own YouTube channel. This protects you from ending up watching what appears to be an independent review but is actually a brand-controlled edit. The original video, in its original form, lives here.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> A re-edited version of a review on a brand's channel could remove negative sections, change context, or present the content as something it isn't.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">2.2</span>
+        <div class="card-title">
+          No paid advertising without a separate agreement.
+          <small>Sending hardware doesn't buy advertising rights.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill no">✗ Google Ads using review footage</span>
+          <span class="pill no">✗ Paid social using review clips</span>
+          <span class="pill yes">✓ Organic social sharing OK</span>
+          <span class="pill yes">✓ Paid ads require separate contract</span>
+        </div>
+        <p>A product loan in exchange for a review does not automatically grant the right to use that review footage in paid advertising campaigns. If a company wants to run ads using this content, that requires a separate commercial agreement — which is a different thing entirely from an independent review.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> Without this clause, a company could send a £500 scanner and end up with thousands of pounds worth of ad creative featuring an "independent" review they didn't pay for.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">2.3</span>
+        <div class="card-title">
+          Content meaning cannot be altered.
+          <small>Including by AI voice synthesis or selective clipping.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill no">✗ AI-altered speech</span>
+          <span class="pill no">✗ Out-of-context clipping</span>
+          <span class="pill yes">✓ Short clips with proper credit OK</span>
+          <span class="pill yes">✓ Context must be preserved</span>
+        </div>
+        <p>Short clips can be shared on social platforms with proper credit — but the meaning and context of what was said cannot be changed. This explicitly covers AI voice synthesis, which could technically make it sound like something different was said, and selective clipping that removes important context.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> A clip of "this scanner is impressive" pulled from a sentence that continued "...but not at this price point" is misinformation. This clause prevents that.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label">03 · Timelines & Process</div>
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">3.1</span>
+        <div class="card-title">
+          Reviews take as long as they take.
+          <small>Corporate promotional schedules don't override thorough testing.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill no">✗ Rushed to meet launch windows</span>
+          <span class="pill no">✗ Guaranteed delivery dates</span>
+          <span class="pill yes">✓ Typically ~1 month from delivery</span>
+          <span class="pill yes">✓ Thoroughness over speed</span>
+        </div>
+        <p>Reviews typically take around a month from receiving hardware. That's not laziness — it's bench testing, real-world use, scripting, filming, and editing done properly. No corporate promotional deadline will rush that process, because a rushed review serves you less well.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> Launch-day reviews produced under time pressure are often surface-level. Problems that only emerge with extended use don't get found. A month of testing finds things a weekend review won't.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">3.2</span>
+        <div class="card-title">
+          Problems during testing get documented.
+          <small>Issues, fixes, and workarounds all go in the video.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill no">✗ "Please don't show that bug"</span>
+          <span class="pill yes">✓ Issues documented transparently</span>
+          <span class="pill yes">✓ Technical support consulted</span>
+          <span class="pill yes">✓ Resolution process shown</span>
+        </div>
+        <p>If something goes wrong during testing, the manufacturer's technical team will be consulted. But the original problem, the troubleshooting process, and the outcome — whether resolved or not — are all fair game for inclusion in the final video. Real-world problems are useful information.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> You're going to encounter the same problems. Knowing they exist, and knowing how to fix them, is more valuable than a review that pretended everything was perfect.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label">04 · The Hardware Itself</div>
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">4.1</span>
+        <div class="card-title">
+          Hardware is kept unless collected.
+          <small>It's payment for testing time, not a loan.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill yes">✓ Kept after review published</span>
+          <span class="pill yes">✓ Can appear in future content</span>
+          <span class="pill no">✗ No leverage over content</span>
+        </div>
+        <p>Unless the manufacturer arranges and pays for return shipping before delivery, hardware sent for review is kept. This matters because hardware that has to be returned can be used as leverage — "send us a positive review or we'll ask for it back." Keeping it removes that leverage entirely.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> A reviewer who might have to return hardware has a subtle incentive to keep the manufacturer happy. Remove that incentive and the review is more honest.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-number">4.2</span>
+        <div class="card-title">
+          Testing isn't always gentle.
+          <small>Real-world evaluation sometimes leaves marks.</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="pills">
+          <span class="pill yes">✓ All care taken</span>
+          <span class="pill no">✗ Compensation for testing wear</span>
+        </div>
+        <p>Thorough hardware evaluation sometimes involves processes that leave equipment in a different condition than it arrived. Every effort is made to handle products carefully, but normal testing wear isn't something that can be compensated for. This is disclosed upfront so there are no surprises.</p>
+        <div class="why-matters"><strong>Why it matters:</strong> A reviewer worried about damaging hardware might avoid tests that would reveal important information. This clause removes that concern.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">The one-line summary</div>
+
+  <div class="intro-box" style="border-left-color: var(--accent2); font-size: 16px; line-height: 1.8;">
+    <strong style="color: var(--accent2);">What this means for you:</strong> When you watch a review on this channel, no part of what you're seeing was approved, softened, timed, or influenced by the manufacturer. The product was tested independently, the results were documented honestly, and the video was published without anyone outside this channel seeing it first. That's the only way a review can actually be useful to you.
+  </div>
+
+  <div class="bottom-box">
+    <h3>Want to read the full framework?</h3>
+    <p>The complete Open Hardware Evaluation Specification (OHES) is publicly available and version controlled. Every clause, in full detail, with no legalese translation required — just the actual terms that govern every hardware collaboration on this channel.</p>
+    <p style="margin-top: 12px;"><a href="https://lostintech3d.github.io/terms/review-terms.html" target="_blank">lostintech3d.github.io/terms/review-terms.html →</a></p>
+  </div>
+
+</main>
+
+<footer>
+  © 2026 Lost In Tech · <a href="https://lostintech3d.github.io/terms/review-terms.html">Full Framework</a> · Independent Hardware Evaluation
+</footer>
+
+</body>
+</html>
